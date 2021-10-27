@@ -24,7 +24,7 @@ public class CameraEffectCtrl : MonoBehaviour
 
     private void Update()
     {
-        _timer += Time.unscaledDeltaTime * 5.0f;
+        _timer += Time.unscaledDeltaTime * 5;
         _cpow = Mathf.Lerp(_opow, _tpow, _timer);
         _noise.m_AmplitudeGain = _cpow;
     }
@@ -32,7 +32,7 @@ public class CameraEffectCtrl : MonoBehaviour
     void CamShake(float pow, float stime)
     {
         _opow = _cpow;
-        _tpow = pow;
+        _tpow = pow * 0.1f / 24.0f;
         _timer = stime;
     }
 
