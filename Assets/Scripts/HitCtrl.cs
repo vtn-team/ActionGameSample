@@ -7,6 +7,7 @@ public class HitCtrl : MonoBehaviour
     [SerializeField] float _power = 5.0f;
     [SerializeField] int _combo = 0;
     [SerializeField] float _comboSpan = 0.5f;
+    [SerializeField] Cinemachine.CinemachineImpulseSource _impluseSource;
     float _stopTime = 0;
     float _frameTimer = 0;
     float _camTime = 0;
@@ -36,16 +37,6 @@ public class HitCtrl : MonoBehaviour
                 Time.timeScale = _timeScale;
             }
         }
-
-        if (_camTime > 0 && _shakeTimer < _camTime)
-        {
-            _shakeTimer += Time.deltaTime;
-            if (_shakeTimer >= _camTime)
-            {
-                CameraEffectCtrl.Shake(0,0);
-                _camTime = 0;
-            }
-        }
     }
 
     private void OnTriggerEnter(Collider other)
@@ -64,9 +55,10 @@ public class HitCtrl : MonoBehaviour
 
     void CamShake()
     {
-        _shakeTimer = 0;
-        _camTime = _power * 0.1f;
-        CameraEffectCtrl.Shake(_power, 1);
+        if (!Setting.HasCameraShake) return;
+
+        Debug.Log("here");
+        _impluseSource?.GenerateImpulse();
     }
 
     void HitStop()
