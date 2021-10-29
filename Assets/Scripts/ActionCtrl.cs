@@ -4,6 +4,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// 行動管理クラス
+/// </summary>
 public class ActionCtrl : MonoBehaviour
 {
     public enum AttackLayer
@@ -19,26 +22,28 @@ public class ActionCtrl : MonoBehaviour
         CreateObject,
     }
 
+    /// <summary>
+    /// 行動定義
+    /// </summary>
     [Serializable]
     class Attack
     {
-        public string Name;
-        public float Power;
-        public int Step;
-        public AttackLayer Layer;
-        public ActionType ActType;
-        public string ActionTargetName;
+        public string Name = "";
+        public float Power = 1;
+        public int Step = 0;
+        public AttackLayer Layer = AttackLayer.InFight;
+        public ActionType ActType = ActionType.Animation;
+        public string ActionTargetName = "";
     }
-    [SerializeField] List<Attack> _attacks;
-    [SerializeField] AnimationCtrl _animCtrl;
+    [SerializeField] List<Attack> _attacks = new List<Attack>();
+    [SerializeField] AnimationCtrl _animCtrl = null;
+    [SerializeField] Cinemachine.CinemachineImpulseSource _impluseSource = null;
 
     HitCtrl _hitCtrl;
 
     const string STANDBY_MOTION = "Sword01";
     float _stopTime = 0;
     float _frameTimer = 0;
-    float _camTime = 0;
-    float _shakeTimer = 0;
     float _timeScale = 0;
     bool _isHitStop = false;
     bool _isActionPlaying = false;
@@ -47,7 +52,7 @@ public class ActionCtrl : MonoBehaviour
 
     List<Character> _targetChars = new List<Character>();
     int _comboStep = 0;
-    AttackLayer _comboLayer;
+    AttackLayer _comboLayer = AttackLayer.InFight;
 
     private void Awake()
     {
@@ -71,16 +76,6 @@ public class ActionCtrl : MonoBehaviour
             if (_frameTimer >= _stopTime)
             {
                 Time.timeScale = _timeScale;
-            }
-        }
-
-        if (_camTime > 0 && _shakeTimer < _camTime)
-        {
-            _shakeTimer += Time.deltaTime;
-            if (_shakeTimer >= _camTime)
-            {
-                CameraEffectCtrl.Shake(0, 1);
-                _camTime = 0;
             }
         }
 
@@ -131,6 +126,11 @@ public class ActionCtrl : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// 行動決定
+    /// </summary>
+    /// <param name="step">ステップ</param>
+    /// <param name="layer">行動レイヤ</param>
     void NextAction(int step, AttackLayer layer)
     {
         int actId = -1;
@@ -172,6 +172,11 @@ public class ActionCtrl : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// HitCtrlからのコールバック
+    /// </summary>
+    /// <param name="c"></param>
+    /// <param name="actId"></param>
     public void HitCallback(Character c, int actId)
     {
         Debug.Log(actId);
@@ -181,20 +186,28 @@ public class ActionCtrl : MonoBehaviour
         c.Damage(100);
         c.HitBack(_attacks[actId].Power);
 
-        CamShake(_attacks[actId].Power);
+        CamShake();
         
         HitStop(_attacks[actId].Power);
 
         _targetChars.Add(c);
     }
     
-    void CamShake(float pow)
+    /// <summary>
+    /// カメラシェイク
+    /// </summary>
+    /// <param name="pow"></param>
+    void CamShake()
     {
-        _shakeTimer = 0;
-        _camTime = pow * 0.1f / 24.0f;
-        CameraEffectCtrl.Shake(pow, 0);
+        if (!Setting.HasCameraShake) return;
+
+        _impluseSource?.GenerateImpulse();
     }
 
+    /// <summary>
+    /// ヒットストップ
+    /// </summary>
+    /// <param name="pow"></param>
     void HitStop(float pow)
     {
         if (!Setting.HasHitStop) return;

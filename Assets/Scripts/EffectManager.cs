@@ -6,8 +6,8 @@ public class EffectManager : MonoBehaviour
     [System.Serializable]
     class Effect
     {
-        public string _name;
-        public GameObject _effect;
+        public string _name = "";
+        public GameObject _effect = null;
     }
 
     [SerializeField] List<Effect> _hitEffect = new List<Effect>();
