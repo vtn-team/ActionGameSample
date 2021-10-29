@@ -16,6 +16,12 @@ public class DamagePopup : MonoBehaviour
         Instance = this;
     }
 
+    /// <summary>
+    /// ダメージ表示
+    /// </summary>
+    /// <param name="go">ダメージを受けたオブジェクト</param>
+    /// <param name="dmg">ダメージ値</param>
+    /// <param name="col">色</param>
     static public void Pop(GameObject go, int dmg, Color col)
     {
         if (!Setting.HasDamageUI) return;

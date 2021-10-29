@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// 攻撃ヒット時のコントローラ
+/// </summary>
 public class HitCtrl : MonoBehaviour
 {
     Collider _collider;
@@ -13,16 +16,21 @@ public class HitCtrl : MonoBehaviour
         _collider = GetComponentInChildren<Collider>();
     }
     
-    void Update()
-    {
-    }
-
+    /// <summary>
+    /// 管理クラス設定
+    /// </summary>
+    /// <param name="actCtrl"></param>
+    /// <param name="actId"></param>
     public void SetCtrl(ActionCtrl actCtrl, int actId)
     {
         _actCtrl = actCtrl;
         _actionId = actId;
     }
 
+    /// <summary>
+    /// ヒット時のコールバック
+    /// </summary>
+    /// <param name="other"></param>
     private void OnTriggerEnter(Collider other)
     {
         if (!other.gameObject.CompareTag("Enemy")) return;

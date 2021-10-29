@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// 簡単なキャラクター管理
+/// </summary>
 public class Character : MonoBehaviour
 {
     Rigidbody _rbody;
@@ -12,11 +15,19 @@ public class Character : MonoBehaviour
         _rbody = GetComponent<Rigidbody>();
     }
 
+    /// <summary>
+    /// ダメージを受けた
+    /// </summary>
+    /// <param name="dmg"></param>
     public void Damage(int dmg)
     {
         DamagePopup.Pop(gameObject, dmg, Color.red);
     }
 
+    /// <summary>
+    /// ノックバックする
+    /// </summary>
+    /// <param name="pow">ノックバックする威力</param>
     public void HitBack(float pow)
     {
         if (!Setting.HasKnockback) return;
