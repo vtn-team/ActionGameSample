@@ -2,16 +2,15 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// 攻撃ヒット時のコントローラ
+/// </summary>
 public class HitCtrl : MonoBehaviour
 {
     [SerializeField] float _power = 5.0f;
-    [SerializeField] int _combo = 0;
-    [SerializeField] float _comboSpan = 0.5f;
-    [SerializeField] Cinemachine.CinemachineImpulseSource _impluseSource;
+    [SerializeField] Cinemachine.CinemachineImpulseSource _impluseSource = null;
     float _stopTime = 0;
     float _frameTimer = 0;
-    float _camTime = 0;
-    float _shakeTimer = 0;
     float _timeScale;
     Collider _collider;
 
@@ -22,6 +21,10 @@ public class HitCtrl : MonoBehaviour
         _collider = GetComponentInChildren<Collider>();
     }
     
+    /// <summary>
+    /// ヒットストップ管理
+    /// NOTE: UpdateはTimescaleの影響を受けない。
+    /// </summary>
     void Update()
     {
         if(_isHitStop)
@@ -29,6 +32,7 @@ public class HitCtrl : MonoBehaviour
             HitStop();
             _isHitStop = false;
         }
+
         if (Time.timeScale == 0 && _frameTimer < _stopTime)
         {
             _frameTimer += Time.unscaledDeltaTime;
@@ -39,11 +43,16 @@ public class HitCtrl : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// ヒット時のコールバック
+    /// </summary>
+    /// <param name="other"></param>
     private void OnTriggerEnter(Collider other)
     {
         if (!other.gameObject.CompareTag("Character")) return;
 
         EffectManager.PlayEffect("Hit", this.transform);
+
         //ここ、本格的に実装する際はキャッシュするなど、工夫は必要
         Character chara = other.gameObject.GetComponent<Character>();
         chara.Damage(100);
@@ -53,6 +62,9 @@ public class HitCtrl : MonoBehaviour
         _isHitStop = true;
     }
 
+    /// <summary>
+    /// カメラを揺らす
+    /// </summary>
     void CamShake()
     {
         if (!Setting.HasCameraShake) return;
@@ -61,6 +73,9 @@ public class HitCtrl : MonoBehaviour
         _impluseSource?.GenerateImpulse();
     }
 
+    /// <summary>
+    /// ヒットストップの指令を出す
+    /// </summary>
     void HitStop()
     {
         if (!Setting.HasHitStop) return;

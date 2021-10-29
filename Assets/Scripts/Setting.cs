@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// 演出管理クラス
+/// </summary>
 public class Setting : MonoBehaviour
 {
     [SerializeField] bool _hasCameraShake = true;

@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// 簡単な飛び道具クラス
+/// </summary>
 public class Wave : MonoBehaviour
 {
     [SerializeField] float _speed = 2.0f;

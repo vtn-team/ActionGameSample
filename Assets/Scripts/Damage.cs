@@ -2,6 +2,9 @@
 using UnityEngine.UI;
 using System.Collections;
 
+/// <summary>
+/// ダメージUIクラス
+/// </summary>
 public class Damage : MonoBehaviour
 {
     [SerializeField] AnimationCurve _animCurve = null;
@@ -21,7 +24,9 @@ public class Damage : MonoBehaviour
         _random = new Vector2(UnityEngine.Random.Range(-10.0f, 10.0f), UnityEngine.Random.Range(-5.0f, 5.0f));
     }
 
-    // Update is called once per frame
+    /// <summary>
+    /// 動きの管理
+    /// </summary>
     void Update()
     {
         if (_target == null)
@@ -42,12 +47,21 @@ public class Damage : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// 設定
+    /// </summary>
+    /// <param name="go">ダメージを受けたオブジェクト</param>
+    /// <param name="dmg">ダメージ値</param>
     public void Set(GameObject go, int dmg)
     {
         _target = go;
         _text.text = dmg.ToString();
     }
 
+    /// <summary>
+    /// 設定
+    /// </summary>
+    /// <param name="col">ダメージの色</param>
     public void SetColor(Color col)
     {
         _text.color = col;

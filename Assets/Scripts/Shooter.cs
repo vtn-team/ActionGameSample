@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// 簡単な飛び道具発射クラス
+/// </summary>
 public class Shooter : MonoBehaviour
 {
     [SerializeField] GameObject _shooter = null;
