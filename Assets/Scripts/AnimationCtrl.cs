@@ -18,14 +18,15 @@ public class AnimationCtrl : MonoBehaviour
         public string stateName;
         public float duration;
     }
-    public delegate void Callback();
+    public delegate void Callback(int param);
 
     [SerializeField] protected Animator _animator;
     [SerializeField] bool _isActiveStart = true;
 
     int _targetLayer = 0;
     float _duration = 0.0f;
-    protected Callback _callback = null;
+    protected Callback _pbkCallback = null;
+    protected Callback _evtCallback = null;
 
     Queue<AnimStack> _animQueue = new Queue<AnimStack>();
 
@@ -121,16 +122,34 @@ public class AnimationCtrl : MonoBehaviour
     */
 
     /// <summary>
+    /// イベントコールバックを設定する
+    /// </summary>
+    /// <param name="cb">コールバック</param>
+    /// <param name="target">監視対象レイヤー</param>
+    public void SetEventDelegate(Callback cb)
+    {
+        _evtCallback = cb;
+    }
+
+    /// <summary>
     /// 再生終了時のコールバックを設定する
     /// </summary>
     /// <param name="cb">コールバック</param>
     /// <param name="target">監視対象レイヤー</param>
     public void SetPlaybackDelegate(Callback cb, int target = 0)
     {
-        _callback = cb;
+        _pbkCallback = cb;
         _targetLayer = target;
     }
 
+    /// <summary>
+    /// アニメーションからのイベントを通知する
+    /// </summary>
+    /// <param name="evntType"></param>
+    public void AnimationEvent(int evtType)
+    {
+        _evtCallback?.Invoke(evtType);
+    }
 
 
     //将来的にコルーチンにする
@@ -143,13 +162,13 @@ public class AnimationCtrl : MonoBehaviour
             _duration -= Time.deltaTime;
         }
 
-        if (_callback != null)
+        if (_pbkCallback != null)
         {
             if (!IsPlayingAnimation(_targetLayer))
             {
-                Callback back = _callback;
-                _callback = null;
-                back();
+                Callback back = _pbkCallback;
+                _pbkCallback = null;
+                back(_targetLayer);
             }
         }
 

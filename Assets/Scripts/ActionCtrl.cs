@@ -57,6 +57,7 @@ public class ActionCtrl : MonoBehaviour
     private void Awake()
     {
         _hitCtrl = GetComponentInChildren<HitCtrl>();
+        _animCtrl?.SetEventDelegate(EventCall);
         _timeScale = Time.timeScale;
     }
 
@@ -90,7 +91,6 @@ public class ActionCtrl : MonoBehaviour
 
         if (Input.GetButtonDown("Fire1"))
         {
-            Debug.Log("here");
             _reserveAction = true;
         }
 
@@ -107,7 +107,6 @@ public class ActionCtrl : MonoBehaviour
         //WDebug.Log(_reserveAction);
         if (_reserveAction && !_isActionPlaying)
         {
-            Debug.Log("come2");
             NextAction(_comboStep, _comboLayer);
             _comboStep++;
             if (_comboStep >= 3)
@@ -120,8 +119,8 @@ public class ActionCtrl : MonoBehaviour
         
         if (!_reserveAction && _waitTimer <= 0.0f)
         {
-            Debug.Log("come1");
             _comboStep = 0;
+            _targetChars.Clear();
             _animCtrl.Play(STANDBY_MOTION);
         }
     }
@@ -158,7 +157,7 @@ public class ActionCtrl : MonoBehaviour
                 _isActionPlaying = true;
                 _waitTimer = 1.0f;
                 _animCtrl.Play(attack.ActionTargetName);
-                _animCtrl.SetPlaybackDelegate(() => {
+                _animCtrl.SetPlaybackDelegate((int targetLayer) => {
                     _isActionPlaying = false;
                 });
                 break;
@@ -173,15 +172,30 @@ public class ActionCtrl : MonoBehaviour
     }
 
     /// <summary>
+    /// イベントコール
+    /// </summary>
+    /// <param name="evtType"></param>
+    public void EventCall(int evtType)
+    {
+        switch(evtType)
+        {
+            case 1:
+                _targetChars.ForEach(c => c.ShootUp());
+                break;
+        }
+    }
+
+    /// <summary>
     /// HitCtrlからのコールバック
     /// </summary>
     /// <param name="c"></param>
     /// <param name="actId"></param>
     public void HitCallback(Character c, int actId)
     {
+        /*
         Debug.Log(actId);
         Debug.Log(_attacks[actId].Power);
-        
+        */
 
         c.Damage(100);
         c.HitBack(_attacks[actId].Power);
@@ -190,7 +204,10 @@ public class ActionCtrl : MonoBehaviour
         
         HitStop(_attacks[actId].Power);
 
-        _targetChars.Add(c);
+        if (!_targetChars.Contains(c))
+        {
+            _targetChars.Add(c);
+        }
     }
     
     /// <summary>

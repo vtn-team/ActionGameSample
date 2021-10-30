@@ -7,11 +7,29 @@ using UnityEngine;
 /// </summary>
 public class Character : MonoBehaviour
 {
+    public enum StateType
+    {
+        Grounded,
+        InAir,
+    }
+    public enum ConditionType
+    {
+        Idle,
+        Stun,
+    }
+
+    StateType _state;
+    ConditionType _cond;
     Rigidbody _rbody;
-    //float _invincibleTimer = 0;
+
+    public StateType State => _state;
+    public ConditionType Condition => _cond;
 
     private void Awake()
     {
+        _state = StateType.Grounded;
+        _cond = ConditionType.Idle;
+
         _rbody = GetComponent<Rigidbody>();
     }
 
@@ -22,6 +40,38 @@ public class Character : MonoBehaviour
     public void Damage(int dmg)
     {
         DamagePopup.Pop(gameObject, dmg, Color.red);
+    }
+
+    private void Update()
+    {
+        StateCheck();
+    }
+
+    /// <summary>
+    /// 打ち上げ
+    /// </summary>
+    public void ShootUp()
+    {
+        //後で適当に力はもらったりする
+        _rbody.AddForce(new Vector3(0, 1, 0) * 10, ForceMode.Impulse);
+        SetState(StateType.InAir);
+    }
+
+    /// <summary>
+    /// ステート移動
+    /// </summary>
+    /// <param name="dmg"></param>
+    void SetState(StateType s)
+    {
+        _state = s;
+    }
+
+    void StateCheck()
+    {
+        if(Mathf.Abs(_rbody.velocity.y) < 0.001f)
+        {
+            SetState(StateType.Grounded);
+        }
     }
 
     /// <summary>
