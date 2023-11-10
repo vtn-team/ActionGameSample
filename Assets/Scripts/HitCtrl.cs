@@ -7,18 +7,25 @@ using UnityEngine;
 /// </summary>
 public class HitCtrl : MonoBehaviour
 {
-    [SerializeField] float _power = 5.0f;
     [SerializeField] Cinemachine.CinemachineImpulseSource _impluseSource = null;
     float _stopTime = 0;
     float _frameTimer = 0;
     float _timeScale;
     Collider _collider;
-
     bool _isHitStop = false;
 
+    float _power = 5.0f;
+    int _dmg = 100;
+    
     private void Awake()
     {
         _collider = GetComponentInChildren<Collider>();
+    }
+
+    public void SetParameter(int dmg, float pow)
+    {
+        _dmg = dmg;
+        _power = pow;
     }
     
     /// <summary>
@@ -56,7 +63,7 @@ public class HitCtrl : MonoBehaviour
 
         //ここ、本格的に実装する際はキャッシュするなど、工夫は必要
         Character chara = other.gameObject.GetComponent<Character>();
-        chara.Damage(100);
+        chara.Damage(_dmg);
         chara.HitBack(_power);
 
         CamShake();

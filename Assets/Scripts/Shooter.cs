@@ -7,13 +7,14 @@ using UnityEngine;
 /// </summary>
 public class Shooter : MonoBehaviour
 {
+    [SerializeField] int _damage = 100;
+    [SerializeField] float _power = 3.0f;
     [SerializeField] GameObject _shooter = null;
     
-    void Update()
+    protected void Shot()
     {
-        if (Input.GetButtonDown("Fire1"))
-        {
-            Instantiate(_shooter, transform.position + transform.forward * 2, transform.rotation);
-        }
+        var shotObj = Instantiate(_shooter, transform.position + transform.forward * 2, transform.rotation);
+        var hitCtrl = shotObj.GetComponent<HitCtrl>();
+        hitCtrl.SetParameter(_damage, _power);
     }
 }

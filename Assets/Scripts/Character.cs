@@ -7,15 +7,26 @@ using UnityEngine;
 /// </summary>
 public class Character : MonoBehaviour
 {
+    public delegate void LifeChange(int diff);
+
     [SerializeField] int _charId = 1; //変えないこと
     [SerializeField] int _hp = 100;
     [SerializeField] int _criRate = 80;
     Rigidbody _rbody;
-    //float _invincibleTimer = 0;
+
+    public int HP => _hp;
+    public int MaxHP { get; protected set; }
+    LifeChange _lifeChange;
 
     private void Awake()
     {
         _rbody = GetComponent<Rigidbody>();
+        MaxHP = _hp;
+    }
+
+    public void SetLifeChangeDelegate(LifeChange dlg)
+    {
+        _lifeChange += dlg;
     }
 
     /// <summary>
@@ -26,7 +37,9 @@ public class Character : MonoBehaviour
     {
         DamagePopup.Pop(gameObject, dmg, Color.red);
         _hp -= dmg;
-        if(_hp <= 0)
+        _lifeChange?.Invoke(dmg);
+
+        if (_hp <= 0)
         {
             GameController.Instance.GameOver(_charId);
         }
