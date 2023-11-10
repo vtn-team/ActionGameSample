@@ -78,7 +78,6 @@ public class HitCtrl : MonoBehaviour
         if (!Setting.HasCameraShake) return;
         if (GameController.IsGameOver) return;
 
-        Debug.Log("here");
         _impluseSource?.GenerateImpulse();
     }
 

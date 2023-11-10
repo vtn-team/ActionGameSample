@@ -15,7 +15,7 @@ public class Damage : MonoBehaviour
     Vector3 _movVec = new Vector3(0, 0.3f, 0);
     Vector3 _mov = Vector3.zero;
     Vector2 _random;
-    GameObject _target = null;
+    Character _target = null;
 
     void Awake()
     {
@@ -38,7 +38,7 @@ public class Damage : MonoBehaviour
         _timer += Time.unscaledDeltaTime;
 
         _mov += _movVec * _animCurve.Evaluate(_timer);
-        _rect.position = RectTransformUtility.WorldToScreenPoint(Camera.main, _target.transform.position) + _random;
+        _rect.position = RectTransformUtility.WorldToScreenPoint(Camera.main, _target.HeadPos) + _random;
         _rect.position += _mov;
 
         if (_timer > 1.0f)
@@ -54,7 +54,8 @@ public class Damage : MonoBehaviour
     /// <param name="dmg">ダメージ値</param>
     public void Set(GameObject go, int dmg)
     {
-        _target = go;
+        _target = go.GetComponent<Character>();
+
         _text.text = dmg.ToString();
     }
 

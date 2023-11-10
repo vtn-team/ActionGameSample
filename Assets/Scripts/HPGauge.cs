@@ -10,7 +10,6 @@ public class HPGauge : MonoBehaviour
     [SerializeField] Image _hpbar;
 
     RectTransform _rect;
-    Vector2 _offset = new Vector2(0, 100);
 
     void Start()
     {
@@ -21,7 +20,7 @@ public class HPGauge : MonoBehaviour
     void Update()
     {
         //‚ ‚ñ‚Ü‚è‚æ‚­‚È‚¢
-        _rect.position = RectTransformUtility.WorldToScreenPoint(Camera.main, _char.transform.position) + _offset;
+        _rect.position = RectTransformUtility.WorldToScreenPoint(Camera.main, _char.HeadPos);
     }
 
     void UpdateLife(int diff)
