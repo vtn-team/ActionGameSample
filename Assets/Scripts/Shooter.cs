@@ -8,7 +8,7 @@ using UnityEngine;
 public class Shooter : MonoBehaviour
 {
     [SerializeField] GameObject _shooter = null;
-
+    
     void Update()
     {
         if (Input.GetButtonDown("Fire1"))

@@ -7,6 +7,9 @@ using UnityEngine;
 /// </summary>
 public class Character : MonoBehaviour
 {
+    [SerializeField] int _charId = 1; //変えないこと
+    [SerializeField] int _hp = 100;
+    [SerializeField] int _criRate = 80;
     Rigidbody _rbody;
     //float _invincibleTimer = 0;
 
@@ -22,6 +25,11 @@ public class Character : MonoBehaviour
     public void Damage(int dmg)
     {
         DamagePopup.Pop(gameObject, dmg, Color.red);
+        _hp -= dmg;
+        if(_hp <= 0)
+        {
+            GameController.Instance.GameOver(_charId);
+        }
     }
 
     /// <summary>
@@ -38,6 +46,6 @@ public class Character : MonoBehaviour
 
     private void OnCollisionEnter(Collision collision)
     {
-        Debug.Log(collision.gameObject.name);
+
     }
 }

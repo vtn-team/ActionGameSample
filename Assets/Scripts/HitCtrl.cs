@@ -50,6 +50,7 @@ public class HitCtrl : MonoBehaviour
     private void OnTriggerEnter(Collider other)
     {
         if (!other.gameObject.CompareTag("Character")) return;
+        if (GameController.IsGameOver) return;
 
         EffectManager.PlayEffect("Hit", this.transform);
 
@@ -68,6 +69,7 @@ public class HitCtrl : MonoBehaviour
     void CamShake()
     {
         if (!Setting.HasCameraShake) return;
+        if (GameController.IsGameOver) return;
 
         Debug.Log("here");
         _impluseSource?.GenerateImpulse();
@@ -79,6 +81,7 @@ public class HitCtrl : MonoBehaviour
     void HitStop()
     {
         if (!Setting.HasHitStop) return;
+        if (GameController.IsGameOver) return;
 
         _stopTime = _power * 1.0f / 24.0f;
 
