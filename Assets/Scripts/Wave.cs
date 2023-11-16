@@ -8,9 +8,14 @@ using UnityEngine;
 public class Wave : MonoBehaviour
 {
     [SerializeField] float _speed = 2.0f;
-    [SerializeField] float _life = 5.0f;
+    float _life;
 
     float _time = 0.0f;
+
+    public void Set(float life)
+    {
+        _life = life;
+    }
 
     void Update()
     {

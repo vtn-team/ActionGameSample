@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -7,14 +8,21 @@ using UnityEngine;
 /// </summary>
 public class Shooter : MonoBehaviour
 {
-    [SerializeField] int _damage = 100;
     [SerializeField] float _power = 3.0f;
-    [SerializeField] GameObject _shooter = null;
-    
+    Character _character;
+
+
+    private void Awake()
+    {
+        _character = GetComponent<Character>();
+    }
+
     protected void Shot()
     {
-        var shotObj = Instantiate(_shooter, transform.position + transform.forward * 2, transform.rotation);
+        var shotObj = Instantiate(_character.Bullets[_character.Index].BulletPrefab, transform.position + transform.forward * 2, transform.rotation);
         var hitCtrl = shotObj.GetComponent<HitCtrl>();
-        hitCtrl.SetParameter(_damage, _power);
+        var wave = shotObj.GetComponent <Wave>();
+        hitCtrl.SetParameter(_character.Bullets[_character.Index].Damage, _power);
+        wave.Set(_character.Bullets[_character.Index].Range);
     }
 }

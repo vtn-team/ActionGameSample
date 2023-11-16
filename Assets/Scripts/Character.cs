@@ -1,6 +1,8 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 /// <summary>
 /// 簡単なキャラクター管理
@@ -14,19 +16,57 @@ public class Character : MonoBehaviour
     [SerializeField] int _criRate = 80;
     [SerializeField] float _moveInterval = 1.0f;
     [SerializeField] GameObject _head;
+    [SerializeField] List<BulletData> _bulletData = new List<BulletData>();
+    public List<BulletData> Bullets => _bulletData;
 
+    InputAction _move;
+    PlayerInput _input;
     Vector3 _initialPos;
     Rigidbody _rbody;
     float _moveTimer = 0.0f;
+    int _bulletIndex = 0;
 
     public Vector3 HeadPos => _head.transform.position;
 
-    public int HP => _hp;
+    public int HP
+    {
+        get => _hp;
+        set
+        {
+            _hp = value;
+        }
+    }
+    public int Index
+    {
+        get => _bulletIndex;
+        set
+        {
+            if (_bulletIndex > _bulletData.Count) return;
+            _bulletIndex = value;
+        }
+    }
     public int MaxHP { get; protected set; }
     LifeChange _lifeChange;
 
+    [Serializable]
+    public class BulletData
+    {
+        [SerializeField]
+        GameObject _bulletPrefab;
+        public GameObject BulletPrefab => _bulletPrefab;
+
+        [SerializeField]
+        int _damage;
+        public int Damage => _damage;
+
+        [SerializeField]
+        float _range;
+        public float Range => _range;
+    }
+
     private void Awake()
     {
+        _input = GetComponent<PlayerInput>();
         _rbody = GetComponent<Rigidbody>();
         MaxHP = _hp;
         _initialPos = transform.position;
@@ -83,6 +123,7 @@ public class Character : MonoBehaviour
             return;
         }
 
+        //if(Gamepad.current.leftStick.)
         //キー入力
         if (_charId == 1)
         {
@@ -109,17 +150,24 @@ public class Character : MonoBehaviour
     {
         Vector3 pos = transform.position;
 
+        Debug.DrawLine(pos, new Vector3(dir.x, pos.y, dir.y), Color.red);
         RaycastHit hit;
-        if (Physics.Raycast(new Vector3(pos.x, 0.3f, pos.z), new Vector3(dir.x, 0, dir.y), out hit))
+        if (Physics.Raycast(pos, new Vector3(dir.x, 0, dir.y), out hit))
         {
+            Debug.Log(hit.distance);
+            Debug.Log(hit.collider.gameObject.layer);
+            Debug.Log(hit.collider.gameObject.name);
+            if (hit.distance < 2.0f && hit.collider.gameObject.layer == 10)
+            {
+                pos = transform.position + (Vector3.up * 6);
+            }
             //壁に近い場合はダメ
-            if (hit.distance < 2.0f)
+            if (hit.distance < 2.0f && hit.collider.gameObject.layer != 9 && hit.collider.gameObject.layer != 10)
             {
                 Debug.Log(hit);
                 return;
             }
         }
-
         //ノックバック分丸める
         float x = Mathf.Round(pos.x - _initialPos.x);
         x = x - x % 2.0f;
@@ -133,8 +181,17 @@ public class Character : MonoBehaviour
         _moveTimer = _moveInterval;
     }
 
-    private void OnCollisionEnter(Collision collision)
+    private void UpMove()
     {
+        transform.position += transform.up * 10;
+    }
 
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.gameObject.layer == 9)
+        {
+            other.gameObject.GetComponent<ItemBase>().Use(this);
+            Destroy(other.gameObject);
+        }
     }
 }

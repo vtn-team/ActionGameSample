@@ -12,12 +12,12 @@ TagManager:
   - 
   - Water
   - UI
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
+  - Wall
+  - Graund
+  - Object
+  - Item
+  - Ladder
+  - BreakLadder
   - 
   - 
   - 
