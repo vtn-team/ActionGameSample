@@ -11,13 +11,12 @@ public class Shooter : MonoBehaviour
     [SerializeField] float _power = 3.0f;
     Character _character;
 
-
-    private void Awake()
+    public void Set(Character charcter)
     {
-        _character = GetComponent<Character>();
+        _character = charcter;
     }
 
-    protected void Shot()
+    public void Shot()
     {
         var shotObj = Instantiate(_character.Bullets[_character.Index].BulletPrefab, transform.position + transform.forward * 2, transform.rotation);
         var hitCtrl = shotObj.GetComponent<HitCtrl>();

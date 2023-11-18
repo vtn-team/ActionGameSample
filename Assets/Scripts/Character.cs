@@ -2,7 +2,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.InputSystem;
+using UnityEngine.SocialPlatforms;
+using UnityEngine.UI;
 
 /// <summary>
 /// 簡単なキャラクター管理
@@ -16,24 +17,33 @@ public class Character : MonoBehaviour
     [SerializeField] int _criRate = 80;
     [SerializeField] float _moveInterval = 1.0f;
     [SerializeField] GameObject _head;
+    [SerializeField] Shooter _shooter;
     [SerializeField] List<BulletData> _bulletData = new List<BulletData>();
+    [SerializeField] Slider _hpBar;
     public List<BulletData> Bullets => _bulletData;
 
-    InputAction _move;
-    PlayerInput _input;
     Vector3 _initialPos;
     Rigidbody _rbody;
     float _moveTimer = 0.0f;
+    float _stopTimer;
     int _bulletIndex = 0;
+    bool _isStop = false;
+    float _timeScale;
 
     public Vector3 HeadPos => _head.transform.position;
+    public int ID => _charId;
 
     public int HP
     {
         get => _hp;
         set
         {
+            _hpBar.value = value;
             _hp = value;
+            if (_hp <= 0)
+            {
+                DestroyAction();
+            }
         }
     }
     public int Index
@@ -66,10 +76,12 @@ public class Character : MonoBehaviour
 
     private void Awake()
     {
-        _input = GetComponent<PlayerInput>();
         _rbody = GetComponent<Rigidbody>();
         MaxHP = _hp;
         _initialPos = transform.position;
+        _shooter.Set(this);
+        _hpBar.maxValue = MaxHP;
+        _hpBar.value = MaxHP;
     }
 
     public void SetLifeChangeDelegate(LifeChange dlg)
@@ -84,13 +96,8 @@ public class Character : MonoBehaviour
     public void Damage(int dmg)
     {
         DamagePopup.Pop(gameObject, dmg, Color.red);
-        _hp -= dmg;
+        HP -= dmg;
         _lifeChange?.Invoke(dmg);
-
-        if (_hp <= 0)
-        {
-            GameController.Instance.GameOver(_charId);
-        }
     }
 
     /// <summary>
@@ -107,38 +114,63 @@ public class Character : MonoBehaviour
 
     void Update()
     {
-        _head.transform.position = new Vector3(transform.position.x, 2, transform.position.z);
-
-        if (GameController.IsGameOver) return;
-
-        if (transform.position.y < -3)
+        if (!_isStop)
         {
-            Damage(MaxHP);
-            return;
+            if (GameController.IsGameOver) return;
+
+            if (transform.position.y < -3)
+            {
+                Damage(MaxHP);
+                return;
+            }
+
+            if (_moveTimer > 0.0f)
+            {
+                _moveTimer -= Time.unscaledDeltaTime;
+                return;
+            }
+
+            //if(Gamepad.current.leftStick.)
+            //キー入力
+            if (_charId == 1 && TurnManager.Instance.IsTurn)
+            {
+                if (Input.GetKeyDown(KeyCode.UpArrow)) Move(new Vector2(0, 1));
+                if (Input.GetKeyDown(KeyCode.DownArrow)) Move(new Vector2(0, -1));
+                if (Input.GetKeyDown(KeyCode.LeftArrow)) Move(new Vector2(-1, 0));
+                if (Input.GetKeyDown(KeyCode.RightArrow)) Move(new Vector2(1, 0));
+                if (Input.GetKeyDown(KeyCode.RightShift))
+                {
+                    _shooter.Shot();
+                    TurnManager.Instance.MoveCount--;
+                }
+            }
+
+            if (_charId == 2 && !TurnManager.Instance.IsTurn)
+            {
+                if (Input.GetKeyDown(KeyCode.W)) Move(new Vector2(0, 1));
+                if (Input.GetKeyDown(KeyCode.S)) Move(new Vector2(0, -1));
+                if (Input.GetKeyDown(KeyCode.A)) Move(new Vector2(-1, 0));
+                if (Input.GetKeyDown(KeyCode.D)) Move(new Vector2(1, 0));
+                if (Input.GetKeyDown(KeyCode.LeftShift))
+                {
+                    _shooter.Shot();
+                    TurnManager.Instance.MoveCount--;
+                }
+            }
         }
-
-        if (_moveTimer > 0.0f)
+        else
         {
-            _moveTimer -= Time.unscaledDeltaTime;
-            return;
-        }
-
-        //if(Gamepad.current.leftStick.)
-        //キー入力
-        if (_charId == 1)
-        {
-            if (Input.GetKeyDown(KeyCode.UpArrow)) Move(new Vector2(0, 1));
-            if (Input.GetKeyDown(KeyCode.DownArrow)) Move(new Vector2(0, -1));
-            if (Input.GetKeyDown(KeyCode.LeftArrow)) Move(new Vector2(-1, 0));
-            if (Input.GetKeyDown(KeyCode.RightArrow)) Move(new Vector2(1, 0));
-        }
-
-        if (_charId == 2)
-        {
-            if (Input.GetKeyDown(KeyCode.W)) Move(new Vector2(0, 1));
-            if (Input.GetKeyDown(KeyCode.S)) Move(new Vector2(0, -1));
-            if (Input.GetKeyDown(KeyCode.A)) Move(new Vector2(-1, 0));
-            if (Input.GetKeyDown(KeyCode.D)) Move(new Vector2(1, 0));
+            _stopTimer += Time.unscaledDeltaTime;
+            if(_stopTimer > 1f)
+            {
+                if(Time.timeScale > _timeScale)
+                {
+                    Time.timeScale = _timeScale;
+                    GameController.Instance.GameOver(_charId);
+                    _isStop = false;
+                }
+                Time.timeScale += Time.unscaledDeltaTime; ;
+            }
         }
     }
 
@@ -148,15 +180,13 @@ public class Character : MonoBehaviour
     /// <param name="dir">移動方向</param>
     public void Move(Vector2 dir)
     {
+        TurnManager.Instance.MoveCount--;
         Vector3 pos = transform.position;
 
         Debug.DrawLine(pos, new Vector3(dir.x, pos.y, dir.y), Color.red);
         RaycastHit hit;
         if (Physics.Raycast(pos, new Vector3(dir.x, 0, dir.y), out hit))
         {
-            Debug.Log(hit.distance);
-            Debug.Log(hit.collider.gameObject.layer);
-            Debug.Log(hit.collider.gameObject.name);
             if (hit.distance < 2.0f && hit.collider.gameObject.layer == 10)
             {
                 pos = transform.position + (Vector3.up * 6);
@@ -181,9 +211,12 @@ public class Character : MonoBehaviour
         _moveTimer = _moveInterval;
     }
 
-    private void UpMove()
+    private void DestroyAction()
     {
-        transform.position += transform.up * 10;
+        _timeScale = Time.timeScale;
+        _rbody.AddForce((-transform.forward + Vector3.up) * 30, ForceMode.Impulse);
+        Time.timeScale = 0;
+        _isStop = true;
     }
 
     private void OnTriggerEnter(Collider other)

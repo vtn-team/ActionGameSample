@@ -13,6 +13,7 @@ using UnityEngine.UI;
 public class GameController : MonoBehaviour
 {
     [SerializeField] Text _text;
+    [SerializeField] GameObject _result;
     static GameController _instance = null;
     static public GameController Instance => _instance;
 
@@ -52,8 +53,7 @@ public class GameController : MonoBehaviour
         {
             _text.text = "PLAYER 1 WIN";
         }
-
-        _text.enabled = true;
+        _result.SetActive(true);
         _state = GameState.Result;
     }
 
