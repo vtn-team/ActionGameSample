@@ -7,18 +7,25 @@ using UnityEngine;
 /// </summary>
 public class HitCtrl : MonoBehaviour
 {
-    [SerializeField] float _power = 5.0f;
     [SerializeField] Cinemachine.CinemachineImpulseSource _impluseSource = null;
     float _stopTime = 0;
     float _frameTimer = 0;
     float _timeScale;
     Collider _collider;
-
     bool _isHitStop = false;
 
+    float _power = 5.0f;
+    int _dmg = 100;
+    
     private void Awake()
     {
         _collider = GetComponentInChildren<Collider>();
+    }
+
+    public void SetParameter(int dmg, float pow)
+    {
+        _dmg = dmg;
+        _power = pow;
     }
     
     /// <summary>
@@ -50,12 +57,13 @@ public class HitCtrl : MonoBehaviour
     private void OnTriggerEnter(Collider other)
     {
         if (!other.gameObject.CompareTag("Character")) return;
+        if (GameController.IsGameOver) return;
 
         EffectManager.PlayEffect("Hit", this.transform);
 
         //ここ、本格的に実装する際はキャッシュするなど、工夫は必要
         Character chara = other.gameObject.GetComponent<Character>();
-        chara.Damage(100);
+        chara.Damage(_dmg);
         chara.HitBack(_power);
 
         CamShake();
@@ -68,8 +76,8 @@ public class HitCtrl : MonoBehaviour
     void CamShake()
     {
         if (!Setting.HasCameraShake) return;
+        if (GameController.IsGameOver) return;
 
-        Debug.Log("here");
         _impluseSource?.GenerateImpulse();
     }
 
@@ -79,6 +87,7 @@ public class HitCtrl : MonoBehaviour
     void HitStop()
     {
         if (!Setting.HasHitStop) return;
+        if (GameController.IsGameOver) return;
 
         _stopTime = _power * 1.0f / 24.0f;
 
