@@ -30,7 +30,7 @@ public class HPGauge : MonoBehaviour
         //‚ ‚ñ‚Ü‚è‚æ‚­‚È‚¢
         _rect.position = RectTransformUtility.WorldToScreenPoint(Camera.main, _char.transform.position) + _offset;
 
-        //
+        //HPƒo[‚Ì‰‰o
         if (_updTimer > 0.0f)
         {
             _updTimer -= Time.deltaTime;
@@ -52,12 +52,20 @@ public class HPGauge : MonoBehaviour
 
     void UpdateLife(int diff)
     {
-        _hpbar.fillAmount = ((float)_char.HP / _char.MaxHP);
-        _updTimer = _effectTotalTime;
+        _hpbar.fillAmount = (float)_char.HP / _char.MaxHP;
+
+        if (Setting.HasHPBarEffect)
+        {
+            _updTimer = _effectTotalTime;
+        }
+        else
+        {
+            _effect.fillAmount = (float)_char.HP / _char.MaxHP;
+        }
     }
 
     float easeInQuint(float t)
     {
-        return 1 - Mathf.Pow(1 - t, 2);
+        return Mathf.Pow(t, 3);
     }
 }

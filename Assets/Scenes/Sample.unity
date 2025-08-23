@@ -140725,10 +140725,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _hasCameraShake: 0
-  _hasParticleEffect: 1
-  _hasHitStop: 1
+  _hasParticleEffect: 0
+  _hasHitStop: 0
   _hasKnockback: 0
-  _hasDamageUI: 1
+  _hasDamageUI: 0
 --- !u!4 &1498293828 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4310614304489658, guid: 5cbae0602ce9acf41a98fda3a353569a,
