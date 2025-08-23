@@ -12,13 +12,15 @@ public class Setting : MonoBehaviour
     [SerializeField] bool _hasHitStop = true;
     [SerializeField] bool _hasKnockback = true;
     [SerializeField] bool _hasDamageUI = true;
+    [SerializeField] bool _hasHPBarEffect = true;
 
     static public bool HasCameraShake => _instance._hasCameraShake;
     static public bool HasParticleEffect => _instance._hasParticleEffect;
     static public bool HasHitStop => _instance._hasHitStop;
     static public bool HasKnockback => _instance._hasKnockback;
     static public bool HasDamageUI => _instance._hasDamageUI;
-    
+    static public bool HasHPBarEffect => _instance._hasHPBarEffect;
+
 
     static Setting _instance;
     private void Awake()
